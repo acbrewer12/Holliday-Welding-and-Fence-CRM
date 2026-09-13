@@ -5,6 +5,8 @@ import { ESTIMATE_STATUS_COLORS, ESTIMATE_STATUS_LABELS } from "@/lib/status";
 import { formatCurrency, formatDate } from "@/lib/format";
 import { sumTotal } from "@/lib/totals";
 
+export const dynamic = "force-dynamic";
+
 export default async function EstimatesPage() {
   const estimates = await prisma.estimate.findMany({
     orderBy: { createdAt: "desc" },

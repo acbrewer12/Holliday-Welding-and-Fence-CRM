@@ -4,6 +4,8 @@ import { PageHeader, LinkButton, Table, Th, Td, EmptyState } from "@/components/
 import { MATERIAL_CATEGORY_LABELS } from "@/lib/status";
 import { formatCurrency } from "@/lib/format";
 
+export const dynamic = "force-dynamic";
+
 export default async function MaterialsPage() {
   const materials = await prisma.material.findMany({
     orderBy: { name: "asc" },

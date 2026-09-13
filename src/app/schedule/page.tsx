@@ -5,6 +5,8 @@ import { ConfirmSubmitButton } from "@/components/ConfirmSubmitButton";
 import { formatDate } from "@/lib/format";
 import { deleteScheduleEvent } from "./actions";
 
+export const dynamic = "force-dynamic";
+
 function timeRange(start: Date, end: Date) {
   const fmt = (d: Date) =>
     new Intl.DateTimeFormat("en-US", { hour: "numeric", minute: "2-digit" }).format(d);

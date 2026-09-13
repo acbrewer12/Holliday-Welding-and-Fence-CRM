@@ -10,6 +10,8 @@ import {
 import { formatCurrency, formatDate, formatDateTime } from "@/lib/format";
 import { sumTotal, isPastDue } from "@/lib/totals";
 
+export const dynamic = "force-dynamic";
+
 const ACTIVE_STATUSES = ["LEAD", "QUOTED", "SCHEDULED", "IN_PROGRESS"] as const;
 
 export default async function DashboardPage() {

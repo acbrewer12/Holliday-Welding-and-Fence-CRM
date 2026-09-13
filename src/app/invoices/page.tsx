@@ -5,6 +5,8 @@ import { INVOICE_STATUS_COLORS, INVOICE_STATUS_LABELS } from "@/lib/status";
 import { formatCurrency, formatDate } from "@/lib/format";
 import { sumTotal, isPastDue } from "@/lib/totals";
 
+export const dynamic = "force-dynamic";
+
 export default async function InvoicesPage() {
   const invoices = await prisma.invoice.findMany({
     orderBy: { createdAt: "desc" },

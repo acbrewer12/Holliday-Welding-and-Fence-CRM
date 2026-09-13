@@ -2,6 +2,8 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { PageHeader, LinkButton, Table, Th, Td, EmptyState } from "@/components/ui";
 
+export const dynamic = "force-dynamic";
+
 export default async function CustomersPage() {
   const customers = await prisma.customer.findMany({
     orderBy: { name: "asc" },
