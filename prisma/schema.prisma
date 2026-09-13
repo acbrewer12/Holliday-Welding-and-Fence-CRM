@@ -1,0 +1,182 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum JobType {
+  WELDING
+  FENCE
+  REPAIR
+  OTHER
+}
+
+enum JobStatus {
+  LEAD
+  QUOTED
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum EstimateStatus {
+  DRAFT
+  SENT
+  ACCEPTED
+  DECLINED
+}
+
+enum InvoiceStatus {
+  DRAFT
+  SENT
+  PAID
+  OVERDUE
+  VOID
+}
+
+enum MaterialCategory {
+  FENCE_PANEL
+  POST
+  GATE
+  HARDWARE
+  WELDING_ROD
+  METAL_STOCK
+  CONCRETE
+  OTHER
+}
+
+model Customer {
+  id        String   @id @default(cuid())
+  name      String
+  email     String?
+  phone     String?
+  address   String?
+  city      String?
+  state     String?
+  zip       String?
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  jobs Job[]
+}
+
+model Job {
+  id             String    @id @default(cuid())
+  title          String
+  type           JobType   @default(FENCE)
+  status         JobStatus @default(LEAD)
+  description    String?
+  address        String?
+  scheduledStart DateTime?
+  scheduledEnd   DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  customerId String
+
+  estimates      Estimate[]
+  invoices       Invoice[]
+  jobMaterials   JobMaterial[]
+  scheduleEvents ScheduleEvent[]
+}
+
+model Estimate {
+  id          String         @id @default(cuid())
+  number      String         @unique
+  status      EstimateStatus @default(DRAFT)
+  issuedDate  DateTime       @default(now())
+  expiryDate  DateTime?
+  notes       String?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  job   Job    @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  jobId String
+
+  items    EstimateItem[]
+  invoices Invoice[]
+}
+
+model EstimateItem {
+  id          String  @id @default(cuid())
+  description String
+  quantity    Float   @default(1)
+  unit        String  @default("ea")
+  unitPrice   Float   @default(0)
+
+  estimate   Estimate @relation(fields: [estimateId], references: [id], onDelete: Cascade)
+  estimateId String
+}
+
+model Invoice {
+  id         String        @id @default(cuid())
+  number     String        @unique
+  status     InvoiceStatus @default(DRAFT)
+  issuedDate DateTime      @default(now())
+  dueDate    DateTime?
+  notes      String?
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  job   Job    @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  jobId String
+
+  estimate   Estimate? @relation(fields: [estimateId], references: [id])
+  estimateId String?
+
+  items InvoiceItem[]
+}
+
+model InvoiceItem {
+  id          String  @id @default(cuid())
+  description String
+  quantity    Float   @default(1)
+  unit        String  @default("ea")
+  unitPrice   Float   @default(0)
+
+  invoice   Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  invoiceId String
+}
+
+model Material {
+  id        String           @id @default(cuid())
+  name      String
+  category  MaterialCategory @default(OTHER)
+  unit      String           @default("ea")
+  unitCost  Float            @default(0)
+  sku       String?
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  jobMaterials JobMaterial[]
+}
+
+model JobMaterial {
+  id               String @id @default(cuid())
+  quantity         Float  @default(1)
+  unitCostAtTime   Float  @default(0)
+
+  job        Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  jobId      String
+  material   Material @relation(fields: [materialId], references: [id], onDelete: Cascade)
+  materialId String
+}
+
+model ScheduleEvent {
+  id        String   @id @default(cuid())
+  title     String
+  start     DateTime
+  end       DateTime
+  crew      String?
+  notes     String?
+  createdAt DateTime @default(now())
+
+  job   Job?    @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  jobId String?
+}
